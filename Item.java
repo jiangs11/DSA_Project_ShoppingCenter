@@ -15,6 +15,13 @@ public class Item {
 		numberOf += amountToAdd;
 	}
 	
+	public int getNumberOf()
+	{
+		return numberOf;
+	}
 	
-	
+	public String getName()
+	{
+		return name;
+	}
 }
