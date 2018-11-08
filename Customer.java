@@ -1,15 +1,15 @@
 
-public class Customer
+public class Customer 
 {
 	private String name;
 	private int timeInStore;
-	private int numItems;
+	private Cart cart;
 	
 	public Customer(int timeInStore, String name)
 	{
 		this.name = name;
 		this.timeInStore = timeInStore;
-		numItems = 0;
+		cart = new Cart();
 	}
 	
 	public String getName()
@@ -24,11 +24,11 @@ public class Customer
 	
 	public int getNumItems()
 	{
-		return numItems;
+		return cart.getNumItems;
 	}
 	
-	public void setTimeInStore(int time) 
+	public void incTimeInStore() 
 	{
-		timeInStore = time;
+		timeInStore--;
 	}
 }
