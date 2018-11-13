@@ -73,10 +73,11 @@ public class Driver
 				"	 7.Print info about customers in checkout lines.\r\n" + 
 				"	 8.Print info about items at or below re-stocking level.\r\n" + 
 				"	 9.Reorder an item.");
+		System.out.print("Make your menu selection now: ");
 		
 		while (true)
 		{
-			System.out.print("Make your menu selection now: ");
+			System.out.print("\nYou know the choice! Select one: ");
 			
 			String response = buff.readLine().trim();
 			System.out.println(response);
@@ -96,7 +97,7 @@ public class Driver
 					
 				// customer picks an item and places it in the shopping cart
 				case "2":
-					addItemToCart(customerList);
+					addItemToCart(customerList, itemList);
 					storeTime++;
 					break;
 					
@@ -128,7 +129,7 @@ public class Driver
 				
 				// print info about items at or below re-stocking level
 				case "8":
-					printRestockingItems();
+					printRestockingItems(itemList, restockAmount);
 					break;
 					
 				// reorder an item
@@ -149,9 +150,10 @@ public class Driver
 	{
 		boolean searching = true;
 		int index = 0;
-		while (searching && index < customerList.size()) 
+		int size = customerList.size();
+		while (searching && index < size) 
 		{
-			if (((Customer) customerList.get(index)).getName().equals(customerName))
+			if ((customerList.get(index)).getName().equals(customerName))
 			{
 				searching = false;
 			}
@@ -178,7 +180,7 @@ public class Driver
 	}
 	
 	// case 2
-	private static void addItemToCart(ListArrayBasedPlus<Customer> customerList)
+	private static void addItemToCart(ListArrayBasedPlus<Customer> customerList, ListArrayBasedPlus<Item> itemList) throws IOException
 	{
 		if (customerList.isEmpty())
 		{
@@ -186,7 +188,28 @@ public class Driver
 		}
 		else
 		{
+			System.out.print(">>Enter customer name : ");
+			String customerName = buff.readLine().trim();
+			System.out.println(customerName);
 			
+			System.out.print(">>What item does " + customerName + "want? ");
+			String itemWanted = buff.readLine().trim();
+			System.out.println(itemWanted);
+			
+			int size = customerList.size();
+			boolean found = false;
+			for (int index = 0; index < size && !found; index++)
+			{
+				Customer customer = customerList.get(index);
+				if (customer.getName().equals(customerName))
+				{
+					customer.incNumItems();
+					customer.incTimeInStore();
+					System.out.println("Customer " + customer.getName() + 
+						" has now " + customer.getNumItems() + " item in the shopping cart.\n");
+					found = true;
+				}
+			}
 		}
 	}
 	
@@ -274,9 +297,18 @@ public class Driver
 	}
 	
 	// case 8
-	private static void printRestockingItems()
+	private static void printRestockingItems(ListArrayBasedPlus<Item> itemList, int restockAmount)
 	{
-		
+		int itemSize = itemList.size();
+		System.out.println("Items at re-stocking level:");
+		for (int i = 0; i < itemSize; i++)
+		{
+			Item item = itemList.get(i);
+			if (item.getNumberOf() <= restockAmount)
+			{
+				System.out.println(item.getName() + " with " + item.getNumberOf() + " items.");
+			}
+		}
 	}
 	
 	// case 9
