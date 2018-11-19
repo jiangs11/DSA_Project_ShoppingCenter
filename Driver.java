@@ -340,7 +340,7 @@ public class Driver
 			
 			if (customer.getNumItems() != 0)
 			{
-				String line = "";
+				//String line = "";
 				
 				if (customer.getNumItems() <= 5)
 				{
