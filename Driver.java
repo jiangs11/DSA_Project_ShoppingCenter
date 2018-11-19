@@ -2,7 +2,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-/*
+import ADTs.*;
+
+/**
  * Purpose: Data Structure and Algorithms Group Project
  * Status: Complete and thoroughly tested
  * Last update: 12/11/18
@@ -28,11 +30,11 @@ public class Driver
 	
 	private static void printMenu() throws NumberFormatException, IOException
 	{
-		ListArrayBasedPlus<Customer> customerList = new ListArrayBasedPlus<Customer>();
-		ListArrayBasedPlus<Item> itemList = new ListArrayBasedPlus<Item>();
-		ResizableArrayQueue<Customer> regular1 = new ResizableArrayQueue<Customer>();
-		ResizableArrayQueue<Customer> regular2 = new ResizableArrayQueue<Customer>();
-		ResizableArrayQueue<Customer> express = new ResizableArrayQueue<Customer>();
+		ListArrayBased<Customer> customerList = new ListArrayBased<Customer>();
+		ListArrayBased<Item> itemList = new ListArrayBased<Item>();
+		QueueRA<Customer> regular1 = new QueueRA<Customer>();
+		QueueRA<Customer> regular2 = new QueueRA<Customer>();
+		QueueRA<Customer> express = new QueueRA<Customer>();
 		
 		System.out.println("Welcome to the Shopping Center!!!\n");
 		
@@ -48,7 +50,7 @@ public class Driver
 		// loop to add each item to the list
 		for (int i = 0; i < numItemsInStore; i++)
 		{
-			System.out.print(">>Enter item name " + (i + 1) + " : ");
+			System.out.print(">>Enter item name : ");
 			String itemName = buff.readLine().trim();
 			System.out.println(itemName);
 			
@@ -59,10 +61,11 @@ public class Driver
 			Item item = new Item(itemName, itemCount);
 			itemList.add(i, item);
 			
-			System.out.println(itemCount + " items of " + itemName + " have been placed in stock.\n");
+			System.out.println(itemCount + " items of " + itemName + " have been placed in stock.");
 		}	// end for
-		
-		chooseStartingLine();
+		System.out.print("Please select the checkout line that should check out customers first (regular1/regular2/express):");
+		String firstLine = buff.readLine();
+		System.out.println(firstLine);
 		
 		System.out.println("\nHere are the choices to select from:\r\n" + 
 				"	 0.Close the Shopping Center.\r\n" + 
@@ -151,6 +154,7 @@ public class Driver
 		}	// end while
 	}	// end printMenu
 	
+	/*
 	private static void chooseStartingLine() throws IOException
 	{
 		System.out.print("Please select the checkout line that should check out "
@@ -161,7 +165,7 @@ public class Driver
 		switch(checkoutLine) 
 		{
 			case "regular1":
-				startingLine = 0;
+				regular1.e
 				break;
 				
 			case "regular2":
@@ -176,9 +180,10 @@ public class Driver
 				break;
 		}
 	}
+	*/
 	
 	// returns true if customer isn't in the store
-	private static boolean searchName(ListArrayBasedPlus<Customer> customerList, String customerName)
+	private static boolean searchName(ListArrayBased<Customer> customerList, String customerName)
 	{
 		boolean searching = true;
 		int index = 0;
@@ -195,7 +200,7 @@ public class Driver
 	}
 	
 	// returns true if item isn't in the store
-	private static boolean searchItem(ListArrayBasedPlus<Item> itemList, String itemName)
+	private static boolean searchItem(ListArrayBased<Item> itemList, String itemName)
 	{
 		boolean searching = true;
 		int index = 0;
@@ -212,7 +217,7 @@ public class Driver
 	}
 	
 	// increments time in store for each customer
-	private static void incTimeForAllCustomers(ListArrayBasedPlus<Customer> customerList)
+	private static void incTimeForAllCustomers(ListArrayBased<Customer> customerList)
 	{
 		int size = customerList.size();
 		
@@ -223,7 +228,7 @@ public class Driver
 	}
 	
 	// case 1
-	private static void addCustomer(ListArrayBasedPlus<Customer> customerList) throws IOException
+	private static void addCustomer(ListArrayBased<Customer> customerList) throws IOException
 	{
 		System.out.print(">>Enter customer name : ");
 		String name = buff.readLine().trim();
@@ -231,7 +236,7 @@ public class Driver
 		boolean found = searchName(customerList, name);
 		if (found)
 		{
-			customerList.add(0, new Customer(name, 0));
+			customerList.add(0, new Customer(name));
 			System.out.println("Customer " + name + " is now in the Shopping Center.\n");
 		}
 		else
@@ -241,7 +246,7 @@ public class Driver
 	}
 	
 	// case 2
-	private static void addItemToCart(ListArrayBasedPlus<Customer> customerList, ListArrayBasedPlus<Item> itemList) throws IOException
+	private static void addItemToCart(ListArrayBased<Customer> customerList, ListArrayBased<Item> itemList) throws IOException
 	{
 		if (customerList.isEmpty())
 		{
@@ -271,7 +276,15 @@ public class Driver
 					Customer customer = customerList.get(index);
 					if (customer.getName().equals(customerName))
 					{
-						customer.incNumItems();
+						int len = itemList.size();
+						for(int i = 0; i < len; i++)
+						{
+							if(itemList.get(i).getName().equals(itemWanted)) {
+								itemList.get(i).addToNumberOf(-1);
+								break;
+							}
+						}
+						customer.addToNumItems(1);
 						System.out.println("Customer " + customer.getName() + 
 							" has now " + customer.getNumItems() + " item in the shopping cart.\n");
 						found = true;
@@ -282,7 +295,7 @@ public class Driver
 	}
 	
 	//case 3
-	private static void removeItemFromCart(ListArrayBasedPlus<Customer> customerList) throws IOException
+	private static void removeItemFromCart(ListArrayBased<Customer> customerList) throws IOException
 	{
 		if (customerList.isEmpty())
 		{
@@ -301,7 +314,7 @@ public class Driver
 				Customer customer = customerList.get(index);
 				if (customer.getName().equals(customerName))
 				{
-					customer.decNumItems();
+					customer.addToNumItems(-1);
 					System.out.println("Customer " + customer.getName() + 
 						" has now " + customer.getNumItems() + " item in the shopping cart.\n");
 					found = true;
@@ -311,8 +324,8 @@ public class Driver
 	}
 	
 	// case 4
-	private static void customerDoneShopping(ListArrayBasedPlus<Customer> customerList, ResizableArrayQueue<Customer> regular1, 
-			ResizableArrayQueue<Customer> regular2, ResizableArrayQueue<Customer> express)
+	private static void customerDoneShopping(ListArrayBased<Customer> customerList, QueueRA<Customer> regular1, 
+			QueueRA<Customer> regular2, QueueRA<Customer> express)
 	{
 		if (customerList.isEmpty())
 		{
@@ -349,7 +362,7 @@ public class Driver
 	}
 		
 	// case 6
-	private static void printShopping(ListArrayBasedPlus<Customer> customerList)
+	private static void printShopping(ListArrayBased<Customer> customerList)
 	{
 		int sizeOfList = customerList.size();
 		if (sizeOfList == 0)
@@ -363,14 +376,14 @@ public class Driver
 			for (int i = 0; i < sizeOfList; i++)
 			{
 				Customer customer = customerList.get(i);
-				System.out.println("\nCustomer " + customer.getName() + " with " + customer.getNumItems() + 
-						" items present for " + customer.getTimeInStore());
+				System.out.println("Customer " + customer.getName() + " with " + customer.getNumItems() + 
+						" items present for " + customer.getTimeInStore() + " minutes");
 			}
 		}
 	}
 	
 	// case 7
-	private static void printCheckingOut(ResizableArrayQueue<Customer> regular1, ResizableArrayQueue<Customer> regular2, ResizableArrayQueue<Customer> express)
+	private static void printCheckingOut(QueueRA<Customer> regular1, QueueRA<Customer> regular2,QueueRA<Customer> express)
 	{
 		if (regular1.isEmpty())
 		{
@@ -399,7 +412,7 @@ public class Driver
 	}
 	
 	// case 8
-	private static void printRestockingItems(ListArrayBasedPlus<Item> itemList, int restockAmount)
+	private static void printRestockingItems(ListArrayBased<Item> itemList, int restockAmount)
 	{
 		int itemSize = itemList.size();
 		System.out.println("Items at re-stocking level:");

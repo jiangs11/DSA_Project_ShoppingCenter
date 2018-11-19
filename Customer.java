@@ -3,13 +3,13 @@ public class Customer
 {
 	private String name;
 	private int timeInStore;
-	private Cart cart;
+	private int numItems;
 	
-	public Customer(int timeInStore, String name)
+	public Customer(String name)
 	{
 		this.name = name;
-		this.timeInStore = timeInStore;
-		cart = new Cart();
+		this.timeInStore = 0;
+		this.numItems = 0;
 	}
 	
 	public String getName()
@@ -24,11 +24,16 @@ public class Customer
 	
 	public int getNumItems()
 	{
-		return cart.getNumItems;
+		return numItems;
+	}
+	
+	public void addToNumItems(int amountToAdd)
+	{
+		numItems += amountToAdd;
 	}
 	
 	public void incTimeInStore() 
 	{
-		timeInStore--;
+		timeInStore++;
 	}
 }
