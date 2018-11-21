@@ -19,10 +19,6 @@ public class Driver
 	// Reader for taking in user input
 	private static BufferedReader buff = new BufferedReader(new InputStreamReader(System.in));
 	
-	// How long the store has been open
-	// Maybe we don't even need this
-	private static int storeTime = 0;
-
 	public static void main(String[] args) throws NumberFormatException, IOException
 	{
 		printMenu();
@@ -32,9 +28,9 @@ public class Driver
 	{
 		ListArrayBased<Customer> customerList = new ListArrayBased<Customer>();
 		ListArrayBased<Item> itemList = new ListArrayBased<Item>();
-		QueueRA<Customer> regular1 = new QueueRA<Customer>();
-		QueueRA<Customer> regular2 = new QueueRA<Customer>();
-		QueueRA<Customer> express = new QueueRA<Customer>();
+		Line regular1 = new Line();
+		Line regular2 = new Line();
+		Line express = new Line();
 		
 		System.out.println("Welcome to the Shopping Center!!!\n");
 		
@@ -63,9 +59,12 @@ public class Driver
 			
 			System.out.println(itemCount + " items of " + itemName + " have been placed in stock.");
 		}	// end for
+		
 		System.out.print("Please select the checkout line that should check out customers first (regular1/regular2/express):");
-		String firstLine = buff.readLine();
-		System.out.println(firstLine);
+		String currentLine= buff.readLine();
+		System.out.println(currentLine);
+		
+		int currentLineTurn = 0;
 		
 		System.out.println("\nHere are the choices to select from:\r\n" + 
 				"	 0.Close the Shopping Center.\r\n" + 
@@ -102,24 +101,22 @@ public class Driver
 				case "2":
 					addItemToCart(customerList, itemList);
 					incTimeForAllCustomers(customerList);
-					storeTime++;
 					break;
 					
 				// customer removes an item from the shopping cart
 				case "3":
 					removeItemFromCart(customerList);
 					incTimeForAllCustomers(customerList);
-					storeTime++;
 					break;
 					
 				// customer is done shopping
 				case "4":
-					customerDoneShopping(customerList, regular1, regular2, express);
+					customerDoneShopping(customerList, regular1, regular2, express, currentLine);
 					break;
 					
 				// customer checks out
 				case "5":
-					customerChecksOut();
+					customerChecksOut(currentLineTurn, regular1, regular2, express, customerList);
 					break;
 					
 				// print info about customers who are shopping
@@ -139,7 +136,7 @@ public class Driver
 					
 				// reorder an item
 				case "9":
-					reorderAnItem();
+					reorderAnItem(itemList);
 					break;
 					
 				// input other than 0-9
@@ -148,7 +145,7 @@ public class Driver
 					break;
 					
 			}	// end switch
-			
+			System.out.println();
 			System.out.print("You know the choices! Select one: ");
 			
 		}	// end while
@@ -179,8 +176,7 @@ public class Driver
 			default:
 				break;
 		}
-	}
-	*/
+	}*/
 	
 	// returns true if customer isn't in the store
 	private static boolean searchName(ListArrayBased<Customer> customerList, String customerName)
@@ -200,20 +196,19 @@ public class Driver
 	}
 	
 	// returns true if item isn't in the store
-	private static boolean searchItem(ListArrayBased<Item> itemList, String itemName)
+	private static int searchItem(ListArrayBased<Item> itemList, String itemName)
 	{
-		boolean searching = true;
-		int index = 0;
-		int size = itemList.size();
-		while (searching && index < size) 
+		int index = -1;
+		int len = itemList.size();
+		for(int i = 0; i < len; i++)
 		{
-			if ((itemList.get(index)).getName().equals(itemName))
+			if(itemList.get(i).getName().equals(itemName))
 			{
-				searching = false;
+				index = i;
+				break;
 			}
-			index++;
 		}
-		return searching;
+		return index;
 	}
 	
 	// increments time in store for each customer
@@ -230,19 +225,22 @@ public class Driver
 	// case 1
 	private static void addCustomer(ListArrayBased<Customer> customerList) throws IOException
 	{
-		System.out.print(">>Enter customer name : ");
-		String name = buff.readLine().trim();
-		System.out.println(name);
-		boolean found = searchName(customerList, name);
-		if (found)
-		{
-			customerList.add(0, new Customer(name));
-			System.out.println("Customer " + name + " is now in the Shopping Center.\n");
-		}
-		else
-		{
-			System.out.println("Customer " + name + " is already in the Shopping Center!\n");
-		}
+		boolean notFound;
+		do {
+			System.out.print(">>Enter customer name : ");
+			String name = buff.readLine().trim();
+			System.out.println(name);
+			notFound = searchName(customerList, name);
+			if (notFound)
+			{
+				customerList.add(0, new Customer(name));
+				System.out.println("Customer " + name + " is now in the Shopping Center.\n");
+			}
+			else
+			{
+				System.out.println("Customer " + name + " is already in the Shopping Center!\n");
+			}
+		}while(!notFound);
 	}
 	
 	// case 2
@@ -254,43 +252,55 @@ public class Driver
 		}
 		else
 		{
-			System.out.print(">>Enter customer name : ");
-			String customerName = buff.readLine().trim();
-			System.out.println(customerName);
-			
-			System.out.print(">>What item does " + customerName + " want? ");
-			String itemWanted = buff.readLine().trim();
-			System.out.println(itemWanted);
-			
-			boolean itemExists = searchItem(itemList, itemWanted);
-			if (itemExists)
-			{
-				System.out.println("No " + itemWanted + " in Shopping Center.\n");
-			}
-			else
-			{
+			boolean found;
+			Customer customer = null;
+			do {
+				System.out.print(">>Enter customer name : ");
+				String customerName = buff.readLine().trim();
+				System.out.println(customerName);
+				
 				int size = customerList.size();
-				boolean found = false;
+				found = false;
 				for (int index = 0; index < size && !found; index++)
 				{
-					Customer customer = customerList.get(index);
-					if (customer.getName().equals(customerName))
+					if (customerList.get(index).getName().equals(customerName))
 					{
-						int len = itemList.size();
-						for(int i = 0; i < len; i++)
-						{
-							if(itemList.get(i).getName().equals(itemWanted)) {
-								itemList.get(i).addToNumberOf(-1);
-								break;
-							}
+						customer = customerList.get(index);
+						if(customer.getState().equals("CheckOut")) {
+							System.out.println("Customer " + customer.getName() + " is in a checkoutline !");
+						}else {
+							found = true;
 						}
-						customer.addToNumItems(1);
-						System.out.println("Customer " + customer.getName() + 
-							" has now " + customer.getNumItems() + " item in the shopping cart.\n");
-						found = true;
 					}
-				}	// end for
-			}
+				}
+			}while(!found);
+				
+				System.out.print(">>What item does " + customer.getName() + " want?");
+				String itemWanted = buff.readLine().trim();
+				System.out.println(itemWanted);
+				
+				int itemExists = searchItem(itemList, itemWanted);
+				if (itemExists == -1 || itemList.get(itemExists).getNumberOf() == 0)
+				{
+					System.out.println("No " + itemWanted + " in stock.");
+				}
+				else
+				{
+					int len = itemList.size();
+					for(int i = 0; i < len; i++)
+					{
+						if(itemList.get(i).getName().equals(itemWanted)) {
+								itemList.get(i).addToNumberOf(-1);
+								customer.addToNumItems(1);
+								System.out.println("Customer " + customer.getName() + 
+									" has now " + customer.getNumItems() + " item in the shopping cart.\n");
+								break;
+						}
+					}
+				}
+					
+					// end for
+			
 		}	// end else
 	}
 	
@@ -324,8 +334,8 @@ public class Driver
 	}
 	
 	// case 4
-	private static void customerDoneShopping(ListArrayBased<Customer> customerList, QueueRA<Customer> regular1, 
-			QueueRA<Customer> regular2, QueueRA<Customer> express)
+	private static void customerDoneShopping(ListArrayBased<Customer> customerList, Line regular1, 
+			Line regular2, Line express, String tieBreakerLine) throws IOException
 	{
 		if (customerList.isEmpty())
 		{
@@ -333,32 +343,112 @@ public class Driver
 		}
 		else
 		{
-			// I still have to read over the conditions for what line customers go to
-			int longestTimeCustomer = customerList.size() - 1;
-			Customer customer = customerList.get(longestTimeCustomer);
-			customerList.remove(longestTimeCustomer);
-			
-			if (customer.getNumItems() != 0)
+			int longestTimeCustomerIndex = 0;
+			Customer longestTimeCustomer = customerList.get(0);
+			int len = customerList.size();
+			for(int i = 1; i < len; i++)
 			{
-				//String line = "";
-				
-				if (customer.getNumItems() <= 5)
+				if(customerList.get(i).getTimeInStore() > longestTimeCustomer.getTimeInStore())
 				{
-					
+					longestTimeCustomerIndex = i;
+					longestTimeCustomer = customerList.get(longestTimeCustomerIndex);
+				}
+			}
+			customerList.remove(longestTimeCustomerIndex);
+			
+			if (longestTimeCustomer.getNumItems() != 0)
+			{				
+				if (longestTimeCustomer.getNumItems() <= 4)
+				{
+					int expressSize = express.getNumCustomers();
+					int regular1Size = regular1.getNumCustomers();
+					int regular2Size = regular2.getNumCustomers();
+					if(expressSize >= 2*regular1Size || expressSize >= 2*regular2Size)
+					{
+						if(regular1Size < regular2Size){
+							regular1.enqueueCustomer(longestTimeCustomer);
+							System.out.println("After " + longestTimeCustomer.getTimeInStore() + " minutes in Shopping Center customer " + longestTimeCustomer.getName() + " with " + longestTimeCustomer.getNumItems() + " items is now in first checkout line.");
+						}else
+						{
+							regular2.enqueueCustomer(longestTimeCustomer);
+							System.out.println("After " + longestTimeCustomer.getTimeInStore() + " minutes in Shopping Center customer " + longestTimeCustomer.getName() + " with " + longestTimeCustomer.getNumItems() + " items is now in second checkout line.");
+						}
+					}else {
+						express.enqueueCustomer(longestTimeCustomer);
+						System.out.println("After " + longestTimeCustomer.getTimeInStore() + " minutes in Shopping Center customer " + longestTimeCustomer.getName() + " with " + longestTimeCustomer.getNumItems() + " items is now in express checkout line.");
+						
+					}
+				}else {
+					if(regular1.getNumCustomers() < regular2.getNumCustomers()){
+						regular1.enqueueCustomer(longestTimeCustomer);
+						System.out.println("After " + longestTimeCustomer.getTimeInStore() + " minutes in Shopping Center customer " + longestTimeCustomer.getName() + " with " + longestTimeCustomer.getNumItems() + " items is now in first checkout line.");
+						
+					}else
+					{
+						regular2.enqueueCustomer(longestTimeCustomer);
+						System.out.println("After " + longestTimeCustomer.getTimeInStore() + " minutes in Shopping Center customer " + longestTimeCustomer.getName() + " with " + longestTimeCustomer.getNumItems() + " items is now in second checkout line.");
+						
+					}
 				}
 			}
 			else
 			{
-				
+				System.out.print("Should customer " + longestTimeCustomer.getName() + " leave or keep on shopping? Leave?(Y/N):");
+				String option = buff.readLine().trim().toUpperCase();
+				System.out.println(option);
+				if(option.equals("N"))
+				{
+					Customer reEnteredCustomer = new Customer(longestTimeCustomer.getName());
+					customerList.add(customerList.size(), reEnteredCustomer);
+					System.out.println("Customer " + reEnteredCustomer.getName() + " with 0 items returned to shopping.");
+				}else {
+					System.out.println(longestTimeCustomer.getName() + " has left the store.");
+				}
 			}
 		}
 	}
 	
 	// case 5
-	private static void customerChecksOut()
+	private static void customerChecksOut(int cLT, Line regular1, Line regular2, Line expressLine, ListArrayBased<Customer> customerList) throws IOException
 	{
-		// customer finishes checking out
-		// Can return to store to shop more, resets timeInStore
+		if(regular1.isEmpty() && regular2.isEmpty() && expressLine.isEmpty()) {
+			System.out.println("\tNo customers in any line.");
+		}else {
+			int currentLineTurn = cLT;
+			Line line = null;
+			do {
+				switch(currentLineTurn)
+				{
+					// Express
+					case 0:
+						line = expressLine;
+						break;
+					// Regular1
+					case 1:
+						line = regular1;
+						break;
+					// Regular2
+					case 2:
+						line = regular2;
+						break;
+				}
+				currentLineTurn = (currentLineTurn + 1) %3;
+			}while(line.isEmpty());
+				
+			Customer customer = line.dequeueCustomer();;
+			
+			System.out.print("Should customer " + customer.getName() + " check out or keep on shopping? Checkout?(Y/N):");
+			String choice = buff.readLine().trim().toUpperCase();
+			System.out.println(choice);
+			if(choice.equals("N")) {
+				Customer rentered = new Customer(customer.getName(), customer.getNumItems());
+				customerList.add(customerList.size(), rentered);
+				System.out.println("Customer " + rentered.getName() + " with " + customer.getNumItems() + " items returned to shopping.");
+			}else {
+				System.out.println("Customer " + customer.getName() + " is now leaving the Shopping Center.");
+			}
+			
+		}
 	}
 		
 	// case 6
@@ -383,7 +473,7 @@ public class Driver
 	}
 	
 	// case 7
-	private static void printCheckingOut(QueueRA<Customer> regular1, QueueRA<Customer> regular2,QueueRA<Customer> express)
+	private static void printCheckingOut(Line regular1, Line regular2,Line express)
 	{
 		if (regular1.isEmpty())
 		{
@@ -427,9 +517,25 @@ public class Driver
 	}
 	
 	// case 9
-	private static void reorderAnItem()
+	private static void reorderAnItem(ListArrayBased<Item> itemList) throws IOException
 	{
+		System.out.print("Enter item name to be re-ordered : ");
+		String itemToBeReordered = buff.readLine().trim();
+		System.out.println(itemToBeReordered);
 		
+		int indexOfItem = searchItem(itemList, itemToBeReordered);
+		if(indexOfItem == -1)
+		{
+			System.out.println(itemToBeReordered + " is not in stock!");
+		}else {
+			System.out.print("Enter number of " + itemToBeReordered + " to be re-ordered : ");
+			int numberToReorder = Integer.parseInt(buff.readLine().trim());
+			System.out.println(numberToReorder);
+			
+			itemList.get(indexOfItem).addToNumberOf(numberToReorder);
+			
+			System.out.println("Stock has now " + itemList.get(indexOfItem).getNumberOf() + " " + itemToBeReordered);	
+		}
 	}
 	
 }	// end class
