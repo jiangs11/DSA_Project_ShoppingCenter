@@ -1,6 +1,6 @@
-
 public class Customer 
 {
+	// attributes for each customer
 	private String name;
 	private int timeInStore;
 	private int numItems;
@@ -21,38 +21,71 @@ public class Customer
 		this.numItems = numItems;
 	}
 	
+	/*
+	 * Accessor method to get the state that the customer is in: browsing or checkout
+	 * 
+	 * @return the state that the customer is in
+	 */
 	public String getState()
 	{
 		return state;
 	}
 	
+	/*
+	 * Mutator method that changes the state that the customer is in, 
+	 * from browsing to checkout
+	 */
 	public void joinCheckout()
 	{
 		state = "CheckOut";
 	}
 	
+	/*
+	 * Accessor method to get the customer's name
+	 * 
+	 * @return the name of the customer
+	 */
 	public String getName()
 	{
 		return name;
 	}
 
+	/*
+	 * Accessor method to get how long the customer has spent in the store
+	 * 
+	 * @return the time that the customer has spent in the store
+	 */
 	public int getTimeInStore()
 	{
 		return timeInStore;
 	}
 	
+	/*
+	 * Accessor method to get the number of items in the customer's cart
+	 * 
+	 * @return the number of items in the customer's cart
+	 */
 	public int getNumItems()
 	{
 		return numItems;
 	}
 	
+	/*
+	 * Mutator method that increases the customer's number of items
+	 * 
+	 * @param amountToAdd the amount to add to the customer's current number of items
+	 */
 	public void addToNumItems(int amountToAdd)
 	{
 		numItems += amountToAdd;
 	}
 	
+	/*
+	 * Mutator method that increases the customer's spent in the store
+	 */
 	public void incTimeInStore() 
 	{
 		timeInStore++;
 	}
-}
+	
+}	// end class

@@ -1,7 +1,8 @@
 import ADTs.QueueRA;
 
-public class Line {
-
+public class Line
+{
+	// attributes for each line in the store
 	private int numCustomers;
 	private QueueRA<Customer>  lineQueue;
 	

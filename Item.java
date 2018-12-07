@@ -1,6 +1,6 @@
-
-public class Item {
-
+public class Item
+{
+	// attributes for each item
 	private String name;
 	private int numberOf;
 	
@@ -10,18 +10,34 @@ public class Item {
 		this.numberOf = numberOf;
 	}
 	
-	public void addToNumberOf(int amountToAdd)
+	/*
+	 * Accessor method to get the name of the item
+	 * 
+	 * @return the name of the item
+	 */
+	public String getName()
 	{
-		numberOf += amountToAdd;
+		return name;
 	}
 	
+	/*
+	 * Accessor method to get the number of items in stock
+	 * 
+	 * @return the number of items in stock
+	 */
 	public int getNumberOf()
 	{
 		return numberOf;
 	}
 	
-	public String getName()
+	/*
+	 * Mutator method that increases the item's number of quantity
+	 * 
+	 * @param amountToAdd the amount to add to the item's number in stock
+	 */
+	public void addToNumberOf(int amountToAdd)
 	{
-		return name;
+		numberOf += amountToAdd;
 	}
-}
+	
+}	// end class

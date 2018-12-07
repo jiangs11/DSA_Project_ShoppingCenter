@@ -61,7 +61,7 @@ public class Driver
 		}	// end for
 		
 		System.out.print("Please select the checkout line that should check out customers first (regular1/regular2/express):");
-		String currentLine= buff.readLine();
+		String currentLine = buff.readLine();
 		System.out.println(currentLine);
 		
 		int currentLineTurn = 0;
@@ -152,203 +152,268 @@ public class Driver
 	}	// end printMenu
 	
 	/*
-	private static void chooseStartingLine() throws IOException
-	{
-		System.out.print("Please select the checkout line that should check out "
-				+ "customers first (regular1/regular2/express):\n");
-		String checkoutLine = buff.readLine().trim().toLowerCase();
-		System.out.println(checkoutLine);
-		
-		switch(checkoutLine) 
-		{
-			case "regular1":
-				regular1.e
-				break;
-				
-			case "regular2":
-				startingLine = 1;
-				break;
-				
-			case "express": 
-				startingLine = 2;
-				break;
-				
-			default:
-				break;
-		}
-	}*/
-	
-	// returns true if customer isn't in the store
+	 *  Helper method that searches through the list, containing all the customers in the store.
+	 *  We want to check whether a customer, who is about to enter the store, is unique. 
+	 *  
+	 *  @param customerList the list containing all the customers in the store
+	 *  @param customerName the name of the customer to check whether they are in the store already
+	 *  @return             true if unique customer, false if already in the store
+	 */
 	private static boolean searchName(ListArrayBased<Customer> customerList, String customerName)
 	{
-		boolean searching = true;
+		// local variables
+		boolean uniqueCustomer = true;
 		int index = 0;
-		int size = customerList.size();
-		while (searching && index < size) 
+		int customerSize = customerList.size();
+		
+		// loops through the collection until a customer is not unique or we reach the end
+		while (uniqueCustomer && index < customerSize) 
 		{
+			// checks the specified customer with each customer item in the list
 			if ((customerList.get(index)).getName().equals(customerName))
 			{
-				searching = false;
-			}
+				// customer is not unique
+				uniqueCustomer = false;
+			}	// end if
+			// increment index
 			index++;
-		}
-		return searching;
-	}
+		}	// end while
+		return uniqueCustomer;
+	}	// end searchName()
 	
-	// returns true if item isn't in the store
+	/*
+	 *  Helper method that searches through the list, containing all the items in the store.
+	 *  We want to check whether an item is actually in the store. 
+	 *  
+	 *  @param itemList the list containing all the items in the store
+	 *  @param itemName the name of the item to check whether it is in the store
+	 *  @return         the index where the item is found or -1 if not found
+	 */
 	private static int searchItem(ListArrayBased<Item> itemList, String itemName)
 	{
+		// local variables
 		int index = -1;
-		int len = itemList.size();
-		for(int i = 0; i < len; i++)
+		int itemSize = itemList.size();
+		boolean found = false;
+		
+		// loops through the collection until an item is found or we reach the end
+		for (int i = 0; i < itemSize && !found; i++)
 		{
-			if(itemList.get(i).getName().equals(itemName))
+			// checks the specified item with each item in the list
+			if (itemList.get(i).getName().equals(itemName))
 			{
+				// grab the desired item index and exit the loop
 				index = i;
-				break;
-			}
-		}
+				found = true;
+			}	// end if
+			// else, increment
+		}	// end for
 		return index;
-	}
+	}	// end searchItem()
 	
-	// increments time in store for each customer
+	/*
+	 *  Helper method that loops through the list, containing all the customers in the store.
+	 *  We want to increment the time spent in store for each customer by 1.
+	 *  
+	 *  @param customerList the list containing all the customers in the store
+	 */
 	private static void incTimeForAllCustomers(ListArrayBased<Customer> customerList)
 	{
-		int size = customerList.size();
+		// local variable
+		int customerSize = customerList.size();
 		
-		for (int i = 0; i < size; i++)
+		// loops through the customer collection until we reach the end
+		for (int i = 0; i < customerSize; i++)
 		{
+			// increments each customers' time spent in store by 1
 			customerList.get(i).incTimeInStore();
-		}
-	}
+		}	// end for
+		
+	}	// end incTimeForAllCustomers()
 	
-	// case 1
+	/*
+	 *  Method that loops through the list, containing all the customers in the store.
+	 *  We want to increment the time spent in store for each customer by 1.
+	 *  
+	 *  @param customerList the list containing all the customers in the store
+	 */
 	private static void addCustomer(ListArrayBased<Customer> customerList) throws IOException
 	{
 		boolean notFound;
-		do {
+		do 
+		{
+			// prompts user for input to insert customer into the store
 			System.out.print(">>Enter customer name : ");
 			String name = buff.readLine().trim();
 			System.out.println(name);
+			
+			// call helper method to check uniqueness of customer
 			notFound = searchName(customerList, name);
+			// only insert if customer name was unique
 			if (notFound)
 			{
+				// inserts customer into list
 				customerList.add(0, new Customer(name));
-				System.out.println("Customer " + name + " is now in the Shopping Center.\n");
+				System.out.println("Customer " + name + " is now in the Shopping Center.");
 			}
 			else
 			{
-				System.out.println("Customer " + name + " is already in the Shopping Center!\n");
+				System.out.println("Customer " + name + " is already in the Shopping Center!");
 			}
-		}while(!notFound);
-	}
+		}
+		// keep looping if customer is already in the list
+		while(!notFound);
+	}	// end addCustomer()
 	
-	// case 2
+	/*
+	 *  Method that increments a customer's number of items in cart and decreases
+	 *  that items' amount left in stock by 1
+	 *  
+	 *  @param customerList the list containing all the customers in the store
+	 *  @param itemList 	the list containing all the items in the store
+	 */
 	private static void addItemToCart(ListArrayBased<Customer> customerList, ListArrayBased<Item> itemList) throws IOException
 	{
 		if (customerList.isEmpty())
 		{
-			System.out.println("\tNo one is in the Shopping Center!\n");
+			System.out.println("\tNo one is in the Shopping Center!");
 		}
 		else
 		{
 			boolean found;
 			Customer customer = null;
-			do {
+			do 
+			{
+				// prompts user for customer name
 				System.out.print(">>Enter customer name : ");
 				String customerName = buff.readLine().trim();
 				System.out.println(customerName);
 				
-				int size = customerList.size();
+				int customerSize = customerList.size();
 				found = false;
-				for (int index = 0; index < size && !found; index++)
+				// loops through the collection until we found the customer or we reach the end
+				for (int index = 0; index < customerSize && !found; index++)
 				{
+					// checks the specified customer with each customer item in the list
 					if (customerList.get(index).getName().equals(customerName))
 					{
+						// grab the customer at current index
 						customer = customerList.get(index);
-						if(customer.getState().equals("CheckOut")) {
+						
+						// checks whether if the customer is still shopping or checking out
+						if (customer.getState().equals("CheckOut"))
+						{
 							System.out.println("Customer " + customer.getName() + " is in a checkoutline !");
-						}else {
+						}
+						// customer is still shopping
+						else
+						{
+							// the customer that was grabbed is what we want
 							found = true;
 						}
-					}
-				}
-			}while(!found);
+					}	// end if
+				}	// end for
+			}	// end do 
+			while(!found);
 				
-				System.out.print(">>What item does " + customer.getName() + " want?");
-				String itemWanted = buff.readLine().trim();
-				System.out.println(itemWanted);
-				
-				int itemExists = searchItem(itemList, itemWanted);
-				if (itemExists == -1 || itemList.get(itemExists).getNumberOf() == 0)
-				{
-					System.out.println("No " + itemWanted + " in stock.");
-				}
-				else
-				{
-					int len = itemList.size();
-					for(int i = 0; i < len; i++)
-					{
-						if(itemList.get(i).getName().equals(itemWanted)) {
-								itemList.get(i).addToNumberOf(-1);
-								customer.addToNumItems(1);
-								System.out.println("Customer " + customer.getName() + 
-									" has now " + customer.getNumItems() + " item in the shopping cart.\n");
-								break;
-						}
-					}
-				}
-					
-					// end for
+			// prompts the user for item name
+			System.out.print(">>What item does " + customer.getName() + " want?");
+			String itemWanted = buff.readLine().trim();
+			System.out.println(itemWanted);
 			
-		}	// end else
-	}
+			// checks if the specified item exists
+			int itemExists = searchItem(itemList, itemWanted);
+			
+			if (itemExists == -1 || itemList.get(itemExists).getNumberOf() == 0)
+			{
+				// item does not exist or out of stock
+				System.out.println("No " + itemWanted + " in stock.");
+			}
+			else
+			{
+				// local variables
+				int itemSize = itemList.size();
+				boolean searching = true;
+				
+				// loops through the item collection until we reach the end
+				for (int i = 0; i < itemSize && searching; i++)
+				{
+					// checks the specified item with each item in the list
+					if (itemList.get(i).getName().equals(itemWanted)) 
+					{
+						// decreases the item's stock amount by 1
+						itemList.get(i).addToNumberOf(-1);
+						// increases increases number of items by 1
+						customer.addToNumItems(1);
+						System.out.println("Customer " + customer.getName() + 
+							" has now " + customer.getNumItems() + " item in the shopping cart.");
+						// exit loop
+						searching = false;
+					}	// end if
+				}	// end for
+			}	// end inner else
+		}	// end outter else
+	}	// end addItemToCart()
 	
-	//case 3
+	/*
+	 *  Method that loops through the list, containing all the customers in the store.
+	 *  We want to increment the time spent in store for each customer by 1.
+	 *  
+	 *  @param customerList the list containing all the customers in the store
+	 */
 	private static void removeItemFromCart(ListArrayBased<Customer> customerList) throws IOException
 	{
 		if (customerList.isEmpty())
 		{
-			System.out.println("\tNo one is in the Shopping Center!\n");
+			System.out.println("\tNo one is in the Shopping Center!");
 		}
 		else
 		{
+			// prompts user for customer name
 			System.out.print(">>Enter customer name : ");
 			String customerName = buff.readLine().trim();
 			System.out.println(customerName);
 			
-			int size = customerList.size();
+			// local variables
+			int customerSize = customerList.size();
 			boolean found = false;
-			for (int index = 0; index < size && !found; index++)
+			
+			// loops through the item collection until we reach the end
+			for (int index = 0; index < customerSize && !found; index++)
 			{
+				// grab the customer at current index
 				Customer customer = customerList.get(index);
+				
+				// checks the specified customer with each customer in the list
 				if (customer.getName().equals(customerName))
 				{
+					// decrements the customers' number of items in cart by 1
 					customer.addToNumItems(-1);
 					System.out.println("Customer " + customer.getName() + 
-						" has now " + customer.getNumItems() + " item in the shopping cart.\n");
+						" has now " + customer.getNumItems() + " item in the shopping cart.");
+					// exit loop
 					found = true;
-				}
+				}	// end if
 			}	// end for
 		}	// end else
-	}
+	}	// end removeItemFromCart()
 	
-	// case 4
+	// NEED COMMENTS
 	private static void customerDoneShopping(ListArrayBased<Customer> customerList, Line regular1, 
 			Line regular2, Line express, String tieBreakerLine) throws IOException
 	{
 		if (customerList.isEmpty())
 		{
-			System.out.println("\tNo customers in the Shopping Center!\n");
+			System.out.println("\tNo customers in the Shopping Center!");
 		}
 		else
 		{
 			int longestTimeCustomerIndex = 0;
 			Customer longestTimeCustomer = customerList.get(0);
-			int len = customerList.size();
-			for(int i = 1; i < len; i++)
+			int customerSize = customerList.size();
+			for (int i = 1; i < customerSize; i++)
 			{
-				if(customerList.get(i).getTimeInStore() > longestTimeCustomer.getTimeInStore())
+				if (customerList.get(i).getTimeInStore() > longestTimeCustomer.getTimeInStore())
 				{
 					longestTimeCustomerIndex = i;
 					longestTimeCustomer = customerList.get(longestTimeCustomerIndex);
@@ -363,31 +428,51 @@ public class Driver
 					int expressSize = express.getNumCustomers();
 					int regular1Size = regular1.getNumCustomers();
 					int regular2Size = regular2.getNumCustomers();
-					if(expressSize >= 2*regular1Size || expressSize >= 2*regular2Size)
+					if ((expressSize >= 2 * regular1Size) || (expressSize >= 2 * regular2Size))
 					{
-						if(regular1Size < regular2Size){
+						if (regular1Size < regular2Size)
+						{
 							regular1.enqueueCustomer(longestTimeCustomer);
-							System.out.println("After " + longestTimeCustomer.getTimeInStore() + " minutes in Shopping Center customer " + longestTimeCustomer.getName() + " with " + longestTimeCustomer.getNumItems() + " items is now in first checkout line.");
-						}else
+							System.out.println("After " + longestTimeCustomer.getTimeInStore() 
+								+ " minutes in Shopping Center customer " + longestTimeCustomer.getName()
+								+ " with " + longestTimeCustomer.getNumItems() 
+								+ " items is now in first checkout line.");
+						}
+						else
 						{
 							regular2.enqueueCustomer(longestTimeCustomer);
-							System.out.println("After " + longestTimeCustomer.getTimeInStore() + " minutes in Shopping Center customer " + longestTimeCustomer.getName() + " with " + longestTimeCustomer.getNumItems() + " items is now in second checkout line.");
+							System.out.println("After " + longestTimeCustomer.getTimeInStore()
+								+ " minutes in Shopping Center customer " + longestTimeCustomer.getName()
+								+ " with " + longestTimeCustomer.getNumItems()
+								+ " items is now in second checkout line.");
 						}
-					}else {
-						express.enqueueCustomer(longestTimeCustomer);
-						System.out.println("After " + longestTimeCustomer.getTimeInStore() + " minutes in Shopping Center customer " + longestTimeCustomer.getName() + " with " + longestTimeCustomer.getNumItems() + " items is now in express checkout line.");
-						
 					}
-				}else {
-					if(regular1.getNumCustomers() < regular2.getNumCustomers()){
+					else 
+					{
+						express.enqueueCustomer(longestTimeCustomer);
+						System.out.println("After " + longestTimeCustomer.getTimeInStore()
+							+ " minutes in Shopping Center customer " + longestTimeCustomer.getName() 
+							+ " with " + longestTimeCustomer.getNumItems()
+							+ " items is now in express checkout line.");
+					}
+				}
+				else
+				{
+					if (regular1.getNumCustomers() < regular2.getNumCustomers())
+					{
 						regular1.enqueueCustomer(longestTimeCustomer);
-						System.out.println("After " + longestTimeCustomer.getTimeInStore() + " minutes in Shopping Center customer " + longestTimeCustomer.getName() + " with " + longestTimeCustomer.getNumItems() + " items is now in first checkout line.");
-						
-					}else
+						System.out.println("After " + longestTimeCustomer.getTimeInStore() 
+							+ " minutes in Shopping Center customer " + longestTimeCustomer.getName() 
+							+ " with " + longestTimeCustomer.getNumItems()
+							+ " items is now in first checkout line.");
+					}
+					else
 					{
 						regular2.enqueueCustomer(longestTimeCustomer);
-						System.out.println("After " + longestTimeCustomer.getTimeInStore() + " minutes in Shopping Center customer " + longestTimeCustomer.getName() + " with " + longestTimeCustomer.getNumItems() + " items is now in second checkout line.");
-						
+						System.out.println("After " + longestTimeCustomer.getTimeInStore() 
+							+ " minutes in Shopping Center customer " + longestTimeCustomer.getName()
+							+ " with " + longestTimeCustomer.getNumItems() 
+							+ " items is now in second checkout line.");
 					}
 				}
 			}
@@ -396,28 +481,44 @@ public class Driver
 				System.out.print("Should customer " + longestTimeCustomer.getName() + " leave or keep on shopping? Leave?(Y/N):");
 				String option = buff.readLine().trim().toUpperCase();
 				System.out.println(option);
-				if(option.equals("N"))
+				if (option.equals("N"))
 				{
 					Customer reEnteredCustomer = new Customer(longestTimeCustomer.getName());
 					customerList.add(customerList.size(), reEnteredCustomer);
 					System.out.println("Customer " + reEnteredCustomer.getName() + " with 0 items returned to shopping.");
-				}else {
+				}
+				else 
+				{
 					System.out.println(longestTimeCustomer.getName() + " has left the store.");
 				}
 			}
 		}
-	}
+	}	// end customerDoneShopping
 	
-	// case 5
-	private static void customerChecksOut(int cLT, Line regular1, Line regular2, Line expressLine, ListArrayBased<Customer> customerList) throws IOException
+	/*
+	 *  
+	 *  
+	 *  @param clt			the line
+	 *  @param regular1 
+	 *  @param regular2 
+	 *  @param expressLine
+	 *  @param customerList the list containing all the customers in the store
+	 */
+	private static void customerChecksOut(int cLT, Line regular1, Line regular2, Line expressLine, 
+			ListArrayBased<Customer> customerList) throws IOException
 	{
-		if(regular1.isEmpty() && regular2.isEmpty() && expressLine.isEmpty()) {
+		// checks if there are no customers in any of the three checkout lines
+		if (regular1.isEmpty() && regular2.isEmpty() && expressLine.isEmpty())
+		{
 			System.out.println("\tNo customers in any line.");
-		}else {
+		}
+		else 
+		{
 			int currentLineTurn = cLT;
 			Line line = null;
-			do {
-				switch(currentLineTurn)
+			do 
+			{
+				switch (currentLineTurn)
 				{
 					// Express
 					case 0:
@@ -433,109 +534,150 @@ public class Driver
 						break;
 				}
 				currentLineTurn = (currentLineTurn + 1) %3;
-			}while(line.isEmpty());
+			}	// end do
+			while(line.isEmpty());
 				
 			Customer customer = line.dequeueCustomer();;
 			
 			System.out.print("Should customer " + customer.getName() + " check out or keep on shopping? Checkout?(Y/N):");
 			String choice = buff.readLine().trim().toUpperCase();
 			System.out.println(choice);
-			if(choice.equals("N")) {
+			if (choice.equals("N")) 
+			{
 				Customer rentered = new Customer(customer.getName(), customer.getNumItems());
 				customerList.add(customerList.size(), rentered);
 				System.out.println("Customer " + rentered.getName() + " with " + customer.getNumItems() + " items returned to shopping.");
-			}else {
+			}
+			else 
+			{
 				System.out.println("Customer " + customer.getName() + " is now leaving the Shopping Center.");
 			}
-			
-		}
-	}
+		}	// end outter else
+	}	// end customerChecksOut()
 		
-	// case 6
+	/*
+	 * 	Method that prints all the customers in the store that are currently shopping.
+	 * 
+	 *  @param customerList the list containing all the customers in the store
+	 */
 	private static void printShopping(ListArrayBased<Customer> customerList)
 	{
-		int sizeOfList = customerList.size();
-		if (sizeOfList == 0)
+		int customerSize = customerList.size();
+		
+		// checks if there are customers in the store
+		if (customerSize == 0)
 		{
-			System.out.println("\tNo customers are in the Shopping Center!\n");
+			System.out.println("\tNo customers are in the Shopping Center!");
 		}
 		else
 		{
-			System.out.println("\tThe following " + sizeOfList + " customers are in the Shopping Center:");
-			//StringBuilder stringBuilder = new StringBuilder();
-			for (int i = 0; i < sizeOfList; i++)
+			System.out.println("\tThe following " + customerSize + " customers are in the Shopping Center:");
+			// loops through the collection until we reach the end
+			for (int i = 0; i < customerSize; i++)
 			{
+				// grabs the customer at the current index
 				Customer customer = customerList.get(i);
-				System.out.println("Customer " + customer.getName() + " with " + customer.getNumItems() + 
+				// displays all the information about that customer
+				System.out.println("\tCustomer " + customer.getName() + " with " + customer.getNumItems() + 
 						" items present for " + customer.getTimeInStore() + " minutes");
-			}
-		}
-	}
+			}	// end for
+		}	// end else
+	}	// end printShopping()
 	
-	// case 7
-	private static void printCheckingOut(Line regular1, Line regular2,Line express)
-	{
+	/*
+	 * 	Method that prints all the customers in each collection that are at the checkout lines.
+	 * 
+	 *  @param regular1    the first regular checkout line
+	 *  @param regular2    the second regular checkout line
+	 *  @param expressLine the express checkout line
+	 */
+	private static void printCheckingOut(Line regular1, Line regular2, Line express)
+	{	
+		// checks if the first regular checkout line is empty
 		if (regular1.isEmpty())
 		{
 			System.out.println("\tNo customers are in the first checkout line!");
 		}
 		else
 		{
+			// prints all customers at the first regular checkout line
 			System.out.println(regular1.toString());
 		}
+		// checks if the second regular checkout line is empty
 		if (regular2.isEmpty())
 		{
 			System.out.println("\tNo customers are in the second checkout line!");
 		}
 		else
 		{
+			// prints all customers at the second regular checkout line
 			System.out.println(regular2.toString());
 		}
+		// checks if the express checkout line is empty
 		if (express.isEmpty())
 		{
-			System.out.println("\tNo customers are in the express checkout line!\n");
+			System.out.println("\tNo customers are in the express checkout line!");
 		}
 		else
 		{
+			// prints all customers at the express checkout line
 			System.out.println(express.toString());
 		}
-	}
+	}	// end printCheckingOut()
 	
-	// case 8
+	/*
+	 *  Method that prints all the items in the collection that are at or below the restocking amount
+	 *  
+	 *  @param itemList 	 the list containing all the items in the store
+	 *  @param restockAmount the amount that the user specified for when to restock an item
+	 */
 	private static void printRestockingItems(ListArrayBased<Item> itemList, int restockAmount)
 	{
 		int itemSize = itemList.size();
-		System.out.println("Items at re-stocking level:");
+		System.out.println("\tItems at re-stocking level:");
+		// loops through the item collection until we reach the end
 		for (int i = 0; i < itemSize; i++)
 		{
+			// grabs the item at the current index
 			Item item = itemList.get(i);
+			// checks if that item is at or below the restocking amount
 			if (item.getNumberOf() <= restockAmount)
 			{
-				System.out.println(item.getName() + " with " + item.getNumberOf() + " items.\n");
-			}
-		}
-	}
+				System.out.println("\t" + item.getName() + " with " + item.getNumberOf() + " items.");
+			}	// end if
+		}	// end for
+	}	// end printRestockingItems()
 	
-	// case 9
+	/*
+	 *  Method that increases specified item's quantity, in stock, by specified quantity.
+	 *  
+	 *  @param itemList the list containing all the items in the store
+	 */
 	private static void reorderAnItem(ListArrayBased<Item> itemList) throws IOException
 	{
+		// prompts user for item to be re-ordered
 		System.out.print("Enter item name to be re-ordered : ");
 		String itemToBeReordered = buff.readLine().trim();
 		System.out.println(itemToBeReordered);
 		
+		// checks whether the specified item exists
 		int indexOfItem = searchItem(itemList, itemToBeReordered);
-		if(indexOfItem == -1)
+		if (indexOfItem == -1)
 		{
 			System.out.println(itemToBeReordered + " is not in stock!");
-		}else {
+		}
+		else 
+		{
+			// prompts user for quantity to be added to the item's stock
 			System.out.print("Enter number of " + itemToBeReordered + " to be re-ordered : ");
 			int numberToReorder = Integer.parseInt(buff.readLine().trim());
 			System.out.println(numberToReorder);
 			
+			// adds the quantity to the item's stock
 			itemList.get(indexOfItem).addToNumberOf(numberToReorder);
 			
 			System.out.println("Stock has now " + itemList.get(indexOfItem).getNumberOf() + " " + itemToBeReordered);	
-		}
-	}
+		}	// end else
+	}	// end reorderAnItem()
 	
 }	// end class
