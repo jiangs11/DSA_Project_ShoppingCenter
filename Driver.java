@@ -100,13 +100,11 @@ public class Driver
 				// customer picks an item and places it in the shopping cart
 				case "2":
 					addItemToCart(customerList, itemList);
-					incTimeForAllCustomers(customerList);
 					break;
 					
 				// customer removes an item from the shopping cart
 				case "3":
 					removeItemFromCart(customerList);
-					incTimeForAllCustomers(customerList);
 					break;
 					
 				// customer is done shopping
@@ -228,7 +226,6 @@ public class Driver
 			// increments each customers' time spent in store by 1
 			customerList.get(i).incTimeInStore();
 		}	// end for
-		
 	}	// end incTimeForAllCustomers()
 	
 	/*
@@ -317,17 +314,21 @@ public class Driver
 			while(!found);
 				
 			// prompts the user for item name
-			System.out.print(">>What item does " + customer.getName() + " want?");
+			System.out.print(">>What item does " + customer.getName() + " want? ");
 			String itemWanted = buff.readLine().trim();
 			System.out.println(itemWanted);
 			
 			// checks if the specified item exists
 			int itemExists = searchItem(itemList, itemWanted);
 			
-			if (itemExists == -1 || itemList.get(itemExists).getNumberOf() == 0)
+			if (itemExists == -1)
 			{
-				// item does not exist or out of stock
-				System.out.println("No " + itemWanted + " in stock.");
+				// item out of stock
+				System.out.println("No " + itemWanted + "s in Shopping Center.");			}
+			else if (itemList.get(itemExists).getNumberOf() == 0)
+			{
+				// item does not exist
+				System.out.println("No " + itemWanted + "s in stock.");
 			}
 			else
 			{
@@ -346,9 +347,11 @@ public class Driver
 						// increases increases number of items by 1
 						customer.addToNumItems(1);
 						System.out.println("Customer " + customer.getName() + 
-							" has now " + customer.getNumItems() + " item in the shopping cart.");
+							" has now " + customer.getNumItems() + " items in the shopping cart.");
 						// exit loop
 						searching = false;
+						// increase time spent in store for all customers by 1
+						incTimeForAllCustomers(customerList);
 					}	// end if
 				}	// end for
 			}	// end inner else
@@ -393,6 +396,8 @@ public class Driver
 						" has now " + customer.getNumItems() + " item in the shopping cart.");
 					// exit loop
 					found = true;
+					// increase time spent in store for all customers by 1
+					incTimeForAllCustomers(customerList);
 				}	// end if
 			}	// end for
 		}	// end else
@@ -533,7 +538,7 @@ public class Driver
 						line = regular2;
 						break;
 				}
-				currentLineTurn = (currentLineTurn + 1) %3;
+				currentLineTurn = (currentLineTurn + 1) % 3;
 			}	// end do
 			while(line.isEmpty());
 				
@@ -676,7 +681,7 @@ public class Driver
 			// adds the quantity to the item's stock
 			itemList.get(indexOfItem).addToNumberOf(numberToReorder);
 			
-			System.out.println("Stock has now " + itemList.get(indexOfItem).getNumberOf() + " " + itemToBeReordered);	
+			System.out.println("Stock has now " + itemList.get(indexOfItem).getNumberOf() + " " + itemToBeReordered + "s.");	
 		}	// end else
 	}	// end reorderAnItem()
 	
