@@ -1,3 +1,10 @@
+/*
+ * The Customer class represents each and every individual person 
+ * that enters the shopping center.
+ * 
+ * @author Matthew Schofield & Steven Jiang
+ * @version 2018.12.11
+ */
 public class Customer 
 {
 	// attributes for each customer

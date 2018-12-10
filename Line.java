@@ -1,5 +1,11 @@
 import ADTs.ListArrayBased;
-
+/*
+ * The Line class represents the one of three different lines
+ * that a customer may enter once they are done shopping.
+ * 
+ * @author Matthew Schofield & Steven Jiang
+ * @version 2018.12.11
+ */
 public class Line
 {
 	// attributes for each line in the store
