@@ -6,6 +6,11 @@ public class Customer
 	private int numItems;
 	private String state;
 	
+	/*
+	 * Creates a Customer object to enter the shopping center
+	 * 
+	 * @param name the name of the customer
+	 */
 	public Customer(String name)
 	{
 		this.name = name;
@@ -14,6 +19,12 @@ public class Customer
 		this.state = "Browsing";
 	}
 	
+	/*
+	 * Creates a Customer object
+	 * 
+	 * @param name the name of the customer
+	 * @param numItems the number of items that the customer currently has
+	 */
 	public Customer(String name, int numItems)
 	{
 		this.name = name;
@@ -89,4 +100,4 @@ public class Customer
 		timeInStore++;
 	}
 	
-}	// end class
+}	// end Customer
