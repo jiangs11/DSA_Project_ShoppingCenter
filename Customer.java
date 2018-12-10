@@ -19,6 +19,7 @@ public class Customer
 		this.name = name;
 		this.timeInStore = 0;
 		this.numItems = numItems;
+		this.state = "Browsing";
 	}
 	
 	/*

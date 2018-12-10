@@ -1,42 +1,59 @@
-import ADTs.QueueRA;
+import ADTs.ListArrayBased;
+import ADTs.MyListReferenceBased;
 
 public class Line
 {
 	// attributes for each line in the store
-	private int numCustomers;
-	private QueueRA<Customer>  lineQueue;
+	private ListArrayBased<Customer>  line;
+	private String name;
 	
-	public Line()
+	public Line(String name)
 	{
-		numCustomers = 0;
-		lineQueue = new QueueRA<>();
+		this.name = name;
+		line = new ListArrayBased<>();
 	}
 	
 	public int getNumCustomers()
 	{
-		return numCustomers;
+		return line.size();
 	}
 	
-	public void enqueueCustomer(Customer customer)
+	public void addCustomer(Customer customer)
 	{
-		lineQueue.enqueue(customer);
-		numCustomers++;
+		line.add(line.size(), customer);
 	}
 	
 	public Customer dequeueCustomer()
 	{
-		numCustomers--;
-		return lineQueue.dequeue();
+		Customer res = line.get(0);
+		line.remove(0);
+		return res;
 	}
 	
 	public Customer peekNext()
 	{
-		return lineQueue.peek();
+		return line.get(0);
 	}
 	
 	public boolean isEmpty()
 	{
-		return lineQueue.isEmpty();
+		return line.size() == 0;
 	}
 	
+	public Customer get(int index)
+	{
+		return line.get(index);
+	}
+	
+	public String toString()
+	{
+		String output = "  The following customer is in the " + name + " checkout line:\n";
+		Customer customer;
+		for(int i = 0; i < line.size(); i++)
+		{
+			customer = line.get(i);
+			output += "\tCustomer " + customer.getName() + " has " + customer.getNumItems() + " items in the shopping basket.\n" ;
+		}
+		return output;
+	}
 }
