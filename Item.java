@@ -2,7 +2,6 @@
  * The Item class represents individual types of item that the
  * user specifies to be in the shopping center.
  * 
- * 
  * @author Matthew Schofield & Steven Jiang
  * @version 2018.12.11
  */
